@@ -1,3 +1,4 @@
+<!--src\views\reports\SafeTransactionsReport.vue--->
 <template>
   <div class="p-6 space-y-6 bg-gray-50 dark:bg-surface-ground min-h-screen">
     <div
@@ -209,6 +210,7 @@ import { ref, computed, onMounted, reactive } from 'vue'
 import { useReportStore } from '@/stores/reportStore'
 import { useRouter } from 'vue-router'
 import AppButton from '@/components/ui/AppButton.vue'
+import { formatCurrency } from '@/utils/formatters'
 
 const reportStore = useReportStore()
 const router = useRouter()
@@ -250,15 +252,6 @@ onMounted(() => {
   fetchReport()
 })
 
-const formatCurrency = (val) => {
-  const number = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
-  }).format(val || 0)
-  return `${number} LYD`
-}
-
-// 🛑 التعديل الثالث: تحديث الألوان بناءً على الأنواع الجديدة in / out
 const getTypeBadgeClass = (type) => {
   if (type === 'in') {
     return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
@@ -268,7 +261,6 @@ const getTypeBadgeClass = (type) => {
   return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
 }
 
-// 🛑 التعديل الرابع: تحديث ألوان المبالغ بناءً على in / out
 const getAmountColor = (type) => {
   if (type === 'in') return 'text-green-600 dark:text-green-400'
   if (type === 'out') return 'text-red-600 dark:text-red-400'

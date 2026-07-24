@@ -311,6 +311,7 @@ import {
   CheckCircleIcon,
 } from '@heroicons/vue/24/outline'
 import AppButton from '@/components/ui/AppButton.vue'
+import { formatCurrency, formatNumber } from '@/utils/formatters'
 
 const store = useDashboardStore()
 const { stats, loading } = storeToRefs(store)
@@ -328,23 +329,6 @@ const todayDate = computed(() => {
     day: 'numeric',
   }).format(new Date())
 })
-
-// 🛑 تنسيق العملة بالأرقام الإنجليزية والدينار الليبي
-const formatCurrency = (val) => {
-  const num = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
-  }).format(val || 0)
-  return `${num} د.ل`
-}
-
-// 🛑 تنسيق الأرقام العادية (للترات والنسب) بالأرقام الإنجليزية
-const formatNumber = (val) => {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(val || 0)
-}
 
 const calculatePaymentPercentage = (amount) => {
   const total = store.stats.overview?.total_collected_revenue || 1

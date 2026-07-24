@@ -1,3 +1,4 @@
+<!--src\views\reports\DailyMovementReport.vue--->
 <template>
   <div class="p-6 space-y-6 bg-gray-50 dark:bg-surface-ground min-h-screen print-container">
     <div
@@ -452,6 +453,7 @@ import {
   ArrowDownTrayIcon,
   BeakerIcon,
 } from '@heroicons/vue/24/outline'
+import { formatCurrency, formatNumber } from '@/utils/formatters'
 
 // تهيئة الـ Store
 const reportStore = useReportStore()
@@ -481,22 +483,6 @@ const fetchReport = async () => {
 onMounted(() => {
   fetchReport()
 })
-
-// دوال تنسيق الأرقام والعملات
-const formatNumber = (val) => {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(val || 0)
-}
-
-const formatCurrency = (val) => {
-  const number = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
-  }).format(val || 0)
-  return `${number} LYD`
-}
 
 // تحديد ألوان شريط تقدم الخزان بناءً على النسبة
 const getFillColorBg = (percentage) => {

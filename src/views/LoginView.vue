@@ -23,7 +23,7 @@
         <div class="relative z-10">
           <div class="text-center mb-8">
             <!-- [مُعدَّل] استخدم شعار مشروعك وعنوانه -->
-            <img src="/MainLogo.png" alt="Project Logo" class="logo-main mx-auto mb-4" />
+            <img src="/MainLogo1.png" alt="Project Logo" class="logo-main mx-auto mb-4" />
             <h1 class="text-4xl font-bold text-white tracking-wider">محطة وقود</h1>
             <p class="mt-2 text-slate-300 opacity-80 text-lg"></p>
           </div>
@@ -290,7 +290,7 @@ const handleLogin = async () => {
   /* 1. الشفافية: غير هذا الرقم لتفتيح أو تغميق الشعار */
   opacity: 0.05;
 
-  background-image: url('/Core_Logo.png');
+  background-image: url('/MainLogo2.png');
   background-repeat: repeat;
 
   /* 2. الحجم والعدد:

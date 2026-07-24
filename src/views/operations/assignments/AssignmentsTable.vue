@@ -104,11 +104,9 @@
 <script setup>
 import { computed } from 'vue'
 import AppTable from '@/components/ui/AppTable.vue'
-// 🛑 1. أضف استيراد أيقونة الحذف (TrashIcon) بجانب القلم
 import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
-
-// 🛑 2. أضف استيراد الـ Auth Store للتحقق من السوبر أدمن
 import { useAuthStore } from '@/stores/authStore'
+import { formatCurrency, formatNumber } from '@/utils/formatters'
 
 defineProps({
   items: Array,
@@ -122,7 +120,6 @@ const isSuperAdmin = computed(() => {
   return authStore.user?.roles?.some((role) => role.name === 'Super Admin')
 })
 
-// 🛑 تحديث الأعمدة لتتناسب مع الهيكلة الجديدة
 const headers = computed(() => [
   { key: 'pump', label: 'المضخة', class: 'text-right' },
   { key: 'user', label: 'العامل المسؤول', class: 'text-right' },
@@ -133,25 +130,7 @@ const headers = computed(() => [
   { key: 'actions', label: '', class: 'w-12' },
 ])
 
-// 🛑 دالة التعامل مع النقر على الصف
 const handleRowClick = (item) => {
   emit('edit', item)
-}
-
-// تنسيق الكميات (لتر) - بخانتين عشريتين
-const formatNumber = (val) => {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(val || 0)
-}
-
-// تنسيق العملة (دينار ليبي) - بـ 3 خانات عشرية
-const formatCurrency = (val) => {
-  const number = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
-  }).format(val || 0)
-  return `${number} د.ل`
 }
 </script>

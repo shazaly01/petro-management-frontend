@@ -1,3 +1,4 @@
+<!--src\views\operations\assignments\AssignmentForm.vue--->
 <template>
   <div
     v-if="loading"
@@ -338,6 +339,7 @@ import WorkersDropdown from '@/components/forms/WorkersDropdown.vue'
 import PumpsDropdown from '@/components/forms/PumpsDropdown.vue'
 import { useAssignmentStore } from '@/stores/assignmentStore'
 import { usePumpStore } from '@/stores/pumpStore'
+import { formatCurrency } from '@/utils/formatters'
 
 const route = useRoute()
 const router = useRouter()
@@ -397,20 +399,13 @@ onMounted(async () => {
 watch(
   () => form.pump_id,
   (newPumpId) => {
-    // حذفنا async لأن العملية الآن لحظية من الذاكرة
     if (!isEditMode.value && newPumpId) {
-      // 🛑 استخدام الوظيفة الجديدة للبحث في المصفوفة
       const p = pumpStore.getPumpFromList(newPumpId)
 
       if (p) {
-        // تعبئة العدادات الافتتاحية من آخر قراءة للمضخة
         form.start_counter_1 = Number(p.current_counter_1)
         form.start_counter_2 = Number(p.current_counter_2)
-
-        // تعبئة سعر اللتر الحالي من الخزان المرتبط بالمضخة
         form.unit_price = p.tank?.fuelType?.current_price || 0
-
-        // تصفير العدادات النهائية مبدئياً لتجنب الحسابات القديمة
         form.end_counter_1 = ''
         form.end_counter_2 = ''
       }
@@ -419,15 +414,6 @@ watch(
 )
 
 // --- الحسابات التلقائية (Computed) ---
-
-const formatCurrency = (val) => {
-  const num = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0, // 🛑 التعديل هنا: جعلناه 0 لإخفاء الكسور الصفرية
-    maximumFractionDigits: 4, // سيظهر الكسر فقط إذا كان موجوداً (حتى 3 خانات)
-  }).format(val || 0)
-
-  return `${num} د.ل`
-}
 
 const calculatedSold1 = computed(() => {
   if (!isEditMode.value || !form.end_counter_1) return '0.00'
@@ -476,7 +462,7 @@ const handleSubmit = async () => {
     if (!payload.bank_amount) payload.bank_amount = 0
 
     if (isEditMode.value) {
-      payload.status = 'completed' // نرسلها دائماً لضمان حسابها في الباك-إند
+      payload.status = 'completed'
       await assignmentStore.updateAssignment(assignmentId, payload)
     } else {
       await assignmentStore.createAssignment(payload)

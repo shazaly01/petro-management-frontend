@@ -1,3 +1,4 @@
+<!---src\views\Vouchers\VoucherTable.vue--->
 <template>
   <AppTable :headers="headers" :items="items" :is-loading="isLoading" :row-clickable="false">
     <template #cell-voucher_no="{ item }">
@@ -70,6 +71,7 @@
 
 <script setup>
 import AppTable from '@/components/ui/AppTable.vue'
+import { formatCurrency } from '@/utils/formatters'
 
 defineProps({
   items: {
@@ -83,22 +85,6 @@ defineProps({
 })
 
 defineEmits(['delete'])
-
-/**
- * دالة تنسيق العملة
- * تظهر 3 أرقام عشرية كحد أقصى (درهم)
- * وتخفيها تماماً إذا كان الرقم صحيحاً
- */
-const formatCurrency = (value) => {
-  if (!value && value !== 0) return ''
-
-  return new Intl.NumberFormat('ar-LY', {
-    style: 'currency',
-    currency: 'LYD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
-  }).format(value)
-}
 
 /**
  * دالة لتحديد لون شارة نوع السند

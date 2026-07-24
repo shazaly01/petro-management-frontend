@@ -1,3 +1,4 @@
+<!--src\views\infrastructure\fuel-types\FuelTypesTable.vue--->
 <template>
   <AppTable :headers="headers" :items="items" :is-loading="loading" :row-clickable="false">
     <template #cell-current_price="{ item }">
@@ -41,6 +42,7 @@
 import { computed } from 'vue'
 import AppTable from '@/components/ui/AppTable.vue'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { formatCurrency } from '@/utils/formatters'
 
 defineProps({
   items: Array,
@@ -55,16 +57,8 @@ defineEmits(['edit', 'delete'])
 const headers = computed(() => [
   { key: 'name', label: 'اسم الوقود', class: 'text-right' },
   { key: 'current_price', label: 'السعر الحالي', class: 'text-right' },
-  { key: 'tanks_count', label: 'عدد الخزانات', class: 'text-right' }, // نفترض أن الباك إند يرسل هذا الحقل
+  { key: 'tanks_count', label: 'عدد الخزانات', class: 'text-right' },
   { key: 'description', label: 'ملاحظات', class: 'text-right' },
   { key: 'actions', label: '', class: 'w-20' },
 ])
-
-const formatCurrency = (val) => {
-  const number = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
-  }).format(val || 0)
-  return `${number} د.ل`
-}
 </script>

@@ -1,3 +1,4 @@
+<!--src\views\infrastructure\tanks\TanksTable.vue--->
 <template>
   <AppTable :headers="headers" :items="items" :is-loading="loading" :row-clickable="false">
     <template #cell-fuel_type="{ item }">
@@ -7,24 +8,55 @@
     </template>
 
     <template #cell-stock_level="{ item }">
-      <div class="w-full max-w-xs">
-        <div class="flex justify-between mb-1 text-xs">
-          <span
-            :class="
-              item.current_stock <= item.alert_threshold
-                ? 'text-danger font-bold'
-                : 'text-text-secondary'
-            "
-          >
-            {{ formatLiters(item.current_stock) }} / {{ formatLiters(item.capacity) }}
+      <div class="w-full max-w-xs py-1">
+        <!-- الرأس: شارة الحالة، كمية المخزون والسعة، والنسبة المئوية -->
+        <div class="flex items-center justify-between mb-1.5 text-xs">
+          <div class="flex items-center gap-2">
+            <!-- شارة حالة المخزون (Badge) -->
+            <span
+              class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border transition-all"
+              :class="getStockStatus(item).badgeClass"
+            >
+              <span
+                class="w-1.5 h-1.5 rounded-full animate-pulse"
+                :class="getStockStatus(item).dotClass"
+              ></span>
+              {{ getStockStatus(item).label }}
+            </span>
+
+            <!-- أرقام المخزون والسعة -->
+            <span class="font-medium text-text-secondary">
+              <strong :class="getStockStatus(item).textClass">{{
+                formatLiters(item.current_stock)
+              }}</strong>
+              <span class="text-text-muted mx-1">/</span>
+              <span>{{ formatLiters(item.capacity) }}</span>
+            </span>
+          </div>
+
+          <!-- النسبة المئوية -->
+          <span class="font-bold text-xs" :class="getStockStatus(item).textClass">
+            {{ calculatePercentage(item) }}%
           </span>
-          <span class="text-text-muted">{{ calculatePercentage(item) }}%</span>
         </div>
-        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+
+        <!-- شريط التقدم المجسم المطور -->
+        <div
+          class="relative w-full bg-gray-200 dark:bg-surface-section rounded-full h-2.5 overflow-hidden p-0.5 border border-gray-300/30 dark:border-surface-border shadow-inner"
+        >
+          <!-- شريط الامتلاء الملون مع تدرج لوني سلس -->
           <div
-            class="h-2 rounded-full transition-all duration-500"
-            :class="getStockBarClass(item)"
-            :style="{ width: calculatePercentage(item) + '%' }"
+            class="h-full rounded-full transition-all duration-500 ease-out shadow-sm"
+            :class="getStockStatus(item).gradientClass"
+            :style="{ width: Math.min(calculatePercentage(item), 100) + '%' }"
+          ></div>
+
+          <!-- مؤشر حد التنبيه (Threshold Marker) -->
+          <div
+            v-if="item.alert_threshold && item.capacity"
+            class="absolute top-0 bottom-0 w-0.5 bg-danger/80 z-10 pointer-events-none"
+            :style="{ right: getThresholdPercentage(item) + '%' }"
+            :title="`حد التنبيه: ${formatLiters(item.alert_threshold)}`"
           ></div>
         </div>
       </div>
@@ -55,6 +87,7 @@
 import { computed } from 'vue'
 import AppTable from '@/components/ui/AppTable.vue'
 import { PencilSquareIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { formatNumber } from '@/utils/formatters'
 
 defineProps({
   items: Array,
@@ -67,23 +100,54 @@ const headers = computed(() => [
   { key: 'code', label: 'كود الخزان', class: 'text-right w-32' },
   { key: 'name', label: 'الاسم', class: 'text-right' },
   { key: 'fuel_type', label: 'نوع الوقود', class: 'text-right' },
-  { key: 'stock_level', label: 'مستوى المخزون', class: 'text-right w-64' },
+  { key: 'stock_level', label: 'مستوى المخزون', class: 'text-right w-72' },
   { key: 'actions', label: '', class: 'w-20' },
 ])
 
 const calculatePercentage = (item) => {
-  if (!item.capacity) return 0
-  return Math.round((item.current_stock / item.capacity) * 100)
+  if (!item?.capacity || item.capacity <= 0) return 0
+  return Math.min(Math.round((item.current_stock / item.capacity) * 100), 100)
 }
 
-const getStockBarClass = (item) => {
+const getThresholdPercentage = (item) => {
+  if (!item?.capacity || !item?.alert_threshold) return 0
+  return Math.min(Math.round((item.alert_threshold / item.capacity) * 100), 100)
+}
+
+const getStockStatus = (item) => {
   const percentage = calculatePercentage(item)
-  if (item.current_stock <= item.alert_threshold) return 'bg-danger' // أحمر إذا وصل للحد الأدنى
-  if (percentage < 30) return 'bg-warning' // أصفر إذا قارب على الانتهاء
-  return 'bg-success' // أخضر إذا كان الوضع طبيعي
+  const isAlert = item.current_stock <= item.alert_threshold
+
+  if (isAlert) {
+    return {
+      label: 'حرج',
+      textClass: 'text-danger font-bold',
+      badgeClass: 'bg-red-500/10 text-danger border-red-500/20 dark:bg-red-500/20',
+      dotClass: 'bg-danger',
+      gradientClass: 'bg-gradient-to-r from-red-600 to-danger',
+    }
+  }
+
+  if (percentage < 30) {
+    return {
+      label: 'منخفض',
+      textClass: 'text-warning font-semibold',
+      badgeClass: 'bg-orange-500/10 text-warning border-orange-500/20 dark:bg-orange-500/20',
+      dotClass: 'bg-warning',
+      gradientClass: 'bg-gradient-to-r from-amber-500 to-warning',
+    }
+  }
+
+  return {
+    label: 'طبيعي',
+    textClass: 'text-success font-semibold',
+    badgeClass: 'bg-green-500/10 text-success border-green-500/20 dark:bg-green-500/20',
+    dotClass: 'bg-success',
+    gradientClass: 'bg-gradient-to-r from-emerald-500 to-success',
+  }
 }
 
 const formatLiters = (val) => {
-  return new Intl.NumberFormat('ar-EG').format(val) + ' لتر'
+  return `${formatNumber(val || 0)} لتر`
 }
 </script>

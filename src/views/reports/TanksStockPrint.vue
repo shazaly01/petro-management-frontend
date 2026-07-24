@@ -6,7 +6,7 @@
   >
     <div class="flex justify-between items-center border-b-2 border-gray-900 pb-4 mb-6">
       <div class="flex items-center gap-4">
-        <img src="/MainLogo2.png" alt="Logo" class="w-16 h-16 object-contain" />
+        <img src="/MainLogo1.png" alt="Logo" class="w-16 h-16 object-contain" />
         <div>
           <h1 class="text-2xl font-black text-gray-900 tracking-tight">محطة الوقود</h1>
           <p class="text-base font-bold text-gray-600">تقرير جرد الخزانات اللحظي</p>

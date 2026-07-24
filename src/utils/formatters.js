@@ -1,44 +1,58 @@
+//src\utils\formatters.js
 /**
  * ملف أدوات التنسيق (Formatters)
+ * src/utils/formatters.js
  */
 
 /**
- * يقوم بتنسيق القيمة الرقمية وإضافة "د.ل" يدوياً.
+ * يقوم بتنسيق القيمة الرقمية وإضافة "ج.س" يدوياً مع إخفاء الكسور للأرقام الصحيحة.
  * @param {number | string | null | undefined} value - القيمة الرقمية.
- * @returns {string} - السلسلة المنسقة، مثال: "1,500 د.ل"
+ * @returns {string} - السلسلة المنسقة، مثال: "1,500,000 ج.س"
  */
 export function formatCurrency(value) {
-  // التحقق من القيم الفارغة
   if (value === null || value === undefined || value === '') {
     return 'N/A'
   }
 
-  // تحويل القيمة إلى رقم لضمان عمل الدالة حتى لو جاءت القيمة كنص من السيرفر
   const numValue = Number(value)
 
-  // إذا لم يكن رقماً صحيحاً (NaN)، نعيد القيمة كما هي أو صفر
   if (isNaN(numValue)) {
-    return '0 د.ل'
+    return '0 ج.س'
   }
 
-  // إعدادات التنسيق (أرقام إنجليزية، فواصل آلاف)
   const options = {
     style: 'decimal',
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
   }
 
-  // إزالة الكسور إذا كان الرقم صحيحاً (بدون فكة)
   if (numValue % 1 === 0) {
     options.maximumFractionDigits = 0
     options.minimumFractionDigits = 0
   }
 
-  // التنسيق باستخدام مكتبة المتصفح القياسية
   const formattedNumber = new Intl.NumberFormat('en-US', options).format(numValue)
 
-  // إرجاع الرقم مع رمز العملة
-  return `${formattedNumber} د.ل`
+  return `${formattedNumber} ج.س`
+}
+
+/**
+ * يقوم بتنسيق الأرقام العامة (مثل الأعداد واللترات) وفصل الآلاف بأرقام إنجليزية.
+ * @param {number | string | null | undefined} value - القيمة الرقمية.
+ * @returns {string} - الرقم المنسق، مثال: "1,500"
+ */
+export function formatNumber(value) {
+  if (value === null || value === undefined || value === '') {
+    return '0'
+  }
+
+  const numValue = Number(value)
+
+  if (isNaN(numValue)) {
+    return '0'
+  }
+
+  return new Intl.NumberFormat('en-US').format(numValue)
 }
 
 /**

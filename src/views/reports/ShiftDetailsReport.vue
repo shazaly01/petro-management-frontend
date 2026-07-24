@@ -1,3 +1,4 @@
+<!--src\views\reports\ShiftDetailsReport.vue--->
 <template>
   <div class="space-y-6">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -236,19 +237,20 @@ import { ref, computed, onMounted } from 'vue'
 import { useReportStore } from '@/stores/reportStore'
 import AppButton from '@/components/ui/AppButton.vue'
 import { useRouter } from 'vue-router'
+import { formatCurrency, formatNumber } from '@/utils/formatters'
 
 const router = useRouter()
 const reportStore = useReportStore()
 const selectedDate = ref(new Date().toISOString().split('T')[0])
 
-// 🛑 المتغير الجديد لحفظ الـ ID الخاص بالوردية المختارة من القائمة المنسدلة
+// المتغير لحفظ الـ ID الخاص بالوردية المختارة من القائمة المنسدلة
 const selectedShiftId = ref('')
 
 const hasData = computed(
   () => !!reportStore.shiftDetailsData && !!reportStore.shiftDetailsData.shifts,
 )
 
-// 🛑 دالة محسوبة تجلب الوردية التي اختارها المستخدم فقط
+// دالة محسوبة تجلب الوردية التي اختارها المستخدم فقط
 const selectedShift = computed(() => {
   if (!hasData.value || !selectedShiftId.value) return null
   return reportStore.shiftDetailsData.shifts.find((s) => s.id === selectedShiftId.value)
@@ -258,28 +260,11 @@ const fetchReport = async () => {
   if (!selectedDate.value) return
   await reportStore.fetchShiftDetails({ date: selectedDate.value })
 
-  // بعد جلب البيانات، نقوم باختيار أول وردية في القائمة تلقائياً (لتسهيل الأمر على المستخدم)
   if (reportStore.shiftDetailsData.shifts && reportStore.shiftDetailsData.shifts.length > 0) {
     selectedShiftId.value = reportStore.shiftDetailsData.shifts[0].id
   } else {
     selectedShiftId.value = ''
   }
-}
-
-const formatNumber = (value) => {
-  if (!value) return '0'
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value)
-}
-
-const formatCurrency = (value) => {
-  if (!value) return '0.00'
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value)
 }
 
 const formatDateTime = (dateString) => {
@@ -294,10 +279,8 @@ onMounted(() => {
 const printReport = () => {
   if (!selectedShift.value) return
 
-  // حفظ الوردية المختارة فقط في الجلسة
   sessionStorage.setItem('shiftPrintData', JSON.stringify(selectedShift.value))
 
-  // توجيه المتصفح لفتح صفحة الطباعة النظيفة
   const routeData = router.resolve({ name: 'PrintShiftDetails' })
   window.open(routeData.href, '_blank')
 }

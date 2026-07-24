@@ -1,3 +1,4 @@
+<!--src\views\reports\DailyMovementPrint.vue-->
 <template>
   <div
     v-if="reportData"
@@ -6,7 +7,7 @@
   >
     <div class="flex justify-between items-center border-b-2 border-gray-900 pb-4 mb-6">
       <div class="flex items-center gap-4">
-        <img src="/MainLogo2.png" alt="Logo" class="w-16 h-16 object-contain" />
+        <img src="/MainLogo1.png" alt="Logo" class="w-16 h-16 object-contain" />
         <div>
           <h1 class="text-2xl font-black text-gray-900 tracking-tight">محطة وقود</h1>
           <p class="text-base font-bold text-gray-600">تقرير الحركة اليومية الشامل</p>
@@ -231,10 +232,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { formatCurrency, formatNumber } from '@/utils/formatters'
 
 const reportData = ref(null)
-const currentDate = new Date().toLocaleDateString('ar-LY')
-const currentTime = new Date().toLocaleTimeString('ar-LY', { hour: '2-digit', minute: '2-digit' })
+const currentDate = new Date().toLocaleDateString('ar-SD')
+const currentTime = new Date().toLocaleTimeString('ar-SD', { hour: '2-digit', minute: '2-digit' })
 
 onMounted(() => {
   const savedData = sessionStorage.getItem('dailyMovementPrintData')
@@ -248,22 +250,6 @@ onMounted(() => {
     alert('عذراً، لم يتم العثور على بيانات للطباعة.')
   }
 })
-
-const formatNumber = (value) => {
-  if (value === undefined || value === null) return '0'
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(value)
-}
-
-const formatCurrency = (val) => {
-  const number = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
-  }).format(val || 0)
-  return `${number} LYD`
-}
 </script>
 
 <style scoped>
